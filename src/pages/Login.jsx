@@ -76,13 +76,7 @@ const Login = ({ onLogin }) => {
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600 text-center mb-2"><strong>Demo Credentials:</strong></p>
-          <p className="text-sm text-gray-700 text-center">
-            Email: <strong>admin@primeconsultancy.et</strong><br />
-            Password: <strong>admin123456</strong>
-          </p>
-        </div>
+
       </div>
     </div>
   )
