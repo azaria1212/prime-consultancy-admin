@@ -10,7 +10,7 @@ const Login = ({ onLogin }) => {
     e.preventDefault()
     
     // Demo authentication
-    if (email === 'admin@primeconsultancy.et' && password === 'admin123456') {
+    if (email === 'admin@primeconsultancy.et' && password === 'admin1216') {
       localStorage.setItem('adminToken', 'demo-token-' + Date.now())
       localStorage.setItem('adminUser', JSON.stringify({
         name: 'Admin User',
@@ -75,6 +75,15 @@ const Login = ({ onLogin }) => {
             Sign In
           </button>
         </form>
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600 text-center mb-2">
+            <strong>Demo Credentials:</strong>
+          </p>
+          <p className="text-sm text-gray-700 text-center">
+            Email: <strong>admin@primeconsultancy.et</strong><br />
+            Password: <strong>admin1216</strong>
+          </p>
+        </div>
 
 
       </div>
