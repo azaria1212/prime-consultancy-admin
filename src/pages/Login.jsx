@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { FaLock, FaUser } from 'react-icons/fa'
-
+const API_URL = 'https://prime-consultancy-backend.onrender.com/api/contact';
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
