@@ -1,15 +1,35 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { FaCalendar, FaEnvelope, FaBlog, FaChartBar, FaStar, FaBriefcase } from 'react-icons/fa'
 
+const API_URL = 'https://prime-consultancy-backend.onrender.com/api';
+
 const Dashboard = () => {
-  const stats = [
-    { icon: FaCalendar, label: 'Appointments', value: '24', color: 'bg-blue-500', pending: 8 },
-    { icon: FaEnvelope, label: 'Messages', value: '15', color: 'bg-green-500', pending: 5 },
-    { icon: FaBlog, label: 'Blog Posts', value: '32', color: 'bg-purple-500', pending: 3 },
-    { icon: FaChartBar, label: 'Case Studies', value: '12', color: 'bg-orange-500', pending: 0 },
-    { icon: FaStar, label: 'Testimonials', value: '45', color: 'bg-yellow-500', pending: 2 },
-    { icon: FaBriefcase, label: 'Services', value: '8', color: 'bg-indigo-500', pending: 0 },
-  ]
+  const [stats, setStats] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${API_URL}/admin/stats`)
+      const data = await response.json()
+      
+      setStats([
+        { icon: FaCalendar, label: 'Appointments', value: data.appointments || 0, color: 'bg-blue-500' },
+        { icon: FaEnvelope, label: 'Messages', value: data.contacts || 0, color: 'bg-green-500' },
+        { icon: FaBlog, label: 'Blog Posts', value: data.blogs || 0, color: 'bg-purple-500' },
+        { icon: FaChartBar, label: 'Case Studies', value: data.caseStudies || 0, color: 'bg-orange-500' },
+        { icon: FaStar, label: 'Testimonials', value: data.testimonials || 0, color: 'bg-yellow-500' },
+        { icon: FaBriefcase, label: 'Services', value: data.services || 0, color: 'bg-indigo-500' },
+      ])
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+      setLoading(false)
+    }
+  }
 
   const recentActivities = [
     { type: 'appointment', message: 'New appointment from John Doe', time: '2 hours ago' },
@@ -27,6 +47,9 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
+      {loading ? (
+        <p className="text-center text-gray-600 py-8">Loading dashboard...</p>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, index) => {
           const Icon = stat.icon
@@ -36,11 +59,6 @@ const Dashboard = () => {
                 <div>
                   <p className="text-gray-600 text-sm mb-1">{stat.label}</p>
                   <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                  {stat.pending > 0 && (
-                    <p className="text-sm text-orange-600 mt-1">
-                      {stat.pending} pending
-                    </p>
-                  )}
                 </div>
                 <div className={`${stat.color} w-16 h-16 rounded-xl flex items-center justify-center`}>
                   <Icon className="text-white" size={28} />
@@ -50,6 +68,7 @@ const Dashboard = () => {
           )
         })}
       </div>
+      )}
 
       {/* Recent Activities */}
       <div className="card">
