@@ -1,25 +1,49 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { FaLock, FaUser } from 'react-icons/fa'
-const API_URL = 'https://prime-consultancy-backend.onrender.com/api/contact';
+
+const API_URL = 'https://prime-consultancy-backend.onrender.com/api';
+
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
     
-    // Demo authentication
-    if (email === 'admin@primeconsultancy.et' && password === 'admin1216') {
-      localStorage.setItem('adminToken', 'demo-token-' + Date.now())
-      localStorage.setItem('adminUser', JSON.stringify({
-        name: 'Admin User',
-        email: email,
-        role: 'admin'
-      }))
-      onLogin()
-    } else {
-      setError('Invalid email or password')
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        localStorage.setItem('adminToken', data.token)
+        localStorage.setItem('adminUser', JSON.stringify(data.user))
+        onLogin()
+      } else {
+        setError(data.message || 'Invalid email or password')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      // Fallback to demo auth if backend not available
+      if (email === 'admin@primeconsultancy.et' && password === 'admin1216') {
+        localStorage.setItem('adminToken', 'demo-token-' + Date.now())
+        localStorage.setItem('adminUser', JSON.stringify({
+          name: 'Admin User',
+          email: email,
+          role: 'admin'
+        }))
+        onLogin()
+      } else {
+        setError('Network error. Using demo mode - check credentials.')
+      }
     }
   }
 

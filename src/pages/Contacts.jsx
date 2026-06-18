@@ -1,31 +1,27 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaEnvelope, FaPhone, FaBuilding, FaCheckCircle } from 'react-icons/fa'
 
+const API_URL = 'https://prime-consultancy-backend.onrender.com/api';
+
 const Contacts = () => {
-  const [contacts] = useState([
-    {
-      id: 1,
-      name: 'Sarah Williams',
-      email: 'sarah@company.com',
-      phone: '+251 911 567 890',
-      company: 'Tech Innovations Ltd',
-      service: 'Business Strategy',
-      message: 'Interested in strategic planning services for our startup...',
-      status: 'new',
-      date: '2026-06-15'
-    },
-    {
-      id: 2,
-      name: 'David Brown',
-      email: 'david@enterprise.com',
-      phone: '+251 911 678 901',
-      company: 'Enterprise Solutions',
-      service: 'Feasibility Study',
-      message: 'Need feasibility study for new project expansion...',
-      status: 'contacted',
-      date: '2026-06-14'
-    },
-  ])
+  const [contacts, setContacts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchContacts()
+  }, [])
+
+  const fetchContacts = async () => {
+    try {
+      const response = await fetch(`${API_URL}/contact`)
+      const data = await response.json()
+      setContacts(data)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching contacts:', error)
+      setLoading(false)
+    }
+  }
 
   const getStatusBadge = (status) => {
     const styles = {
@@ -48,14 +44,19 @@ const Contacts = () => {
       </div>
 
       <div className="grid gap-6">
-        {contacts.map((contact) => (
-          <div key={contact.id} className="card hover:shadow-xl transition-shadow">
+        {loading ? (
+          <p className="text-center text-gray-600 py-8">Loading contacts...</p>
+        ) : contacts.length === 0 ? (
+          <p className="text-center text-gray-600 py-8">No contacts yet</p>
+        ) : (
+          contacts.map((contact) => (
+          <div key={contact._id || contact.id} className="card hover:shadow-xl transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{contact.name}</h3>
-                <p className="text-gray-600">{contact.company}</p>
+                <h3 className="text-xl font-bold text-gray-900">{contact.fullName || contact.name}</h3>
+                <p className="text-gray-600">{contact.companyName || contact.company || 'No company'}</p>
               </div>
-              {getStatusBadge(contact.status)}
+              {getStatusBadge(contact.status || 'new')}
             </div>
             
             <div className="grid md:grid-cols-3 gap-4 mb-4">
@@ -69,7 +70,7 @@ const Contacts = () => {
               </div>
               <div className="flex items-center space-x-2 text-gray-700">
                 <FaBuilding className="text-gray-400" />
-                <span className="text-sm">{contact.service}</span>
+                <span className="text-sm">{contact.serviceNeeded || contact.service}</span>
               </div>
             </div>
             
@@ -78,14 +79,15 @@ const Contacts = () => {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">{new Date(contact.date).toLocaleDateString()}</span>
+              <span className="text-sm text-gray-500">{new Date(contact.createdAt || contact.date).toLocaleDateString()}</span>
               <button className="btn-primary flex items-center space-x-2">
                 <FaCheckCircle />
                 <span>Mark as Contacted</span>
               </button>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   )

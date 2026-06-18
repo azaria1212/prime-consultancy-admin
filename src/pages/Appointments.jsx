@@ -1,39 +1,27 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaClock, FaUser, FaEnvelope, FaPhone, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 
+const API_URL = 'https://prime-consultancy-backend.onrender.com/api';
+
 const Appointments = () => {
-  const [appointments] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+251 911 234 567',
-      service: 'Business Strategy',
-      date: '2026-06-20',
-      status: 'pending',
-      company: 'ABC Corp'
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+251 911 345 678',
-      service: 'Feasibility Study',
-      date: '2026-06-22',
-      status: 'confirmed',
-      company: 'XYZ Industries'
-    },
-    {
-      id: 3,
-      name: 'Michael Johnson',
-      email: 'michael@example.com',
-      phone: '+251 911 456 789',
-      service: 'Project Evaluation',
-      date: '2026-06-25',
-      status: 'pending',
-      company: 'Tech Solutions Ltd'
-    },
-  ])
+  const [appointments, setAppointments] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchAppointments()
+  }, [])
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch(`${API_URL}/appointments`)
+      const data = await response.json()
+      setAppointments(data)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching appointments:', error)
+      setLoading(false)
+    }
+  }
 
   const getStatusBadge = (status) => {
     const styles = {
