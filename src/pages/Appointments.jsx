@@ -14,11 +14,13 @@ const Appointments = () => {
   const fetchAppointments = async () => {
     try {
       const response = await fetch(`${API_URL}/appointments`)
+      if (!response.ok) throw new Error('Failed to fetch')
       const data = await response.json()
-      setAppointments(data)
+      setAppointments(Array.isArray(data) ? data : [])
       setLoading(false)
     } catch (error) {
       console.error('Error fetching appointments:', error)
+      setAppointments([])
       setLoading(false)
     }
   }

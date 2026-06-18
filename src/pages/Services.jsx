@@ -14,11 +14,13 @@ const Services = () => {
   const fetchServices = async () => {
     try {
       const response = await fetch(`${API_URL}/services`)
+      if (!response.ok) throw new Error('Failed to fetch')
       const data = await response.json()
-      setServices(data)
+      setServices(Array.isArray(data) ? data : [])
       setLoading(false)
     } catch (error) {
       console.error('Error fetching services:', error)
+      setServices([])
       setLoading(false)
     }
   }

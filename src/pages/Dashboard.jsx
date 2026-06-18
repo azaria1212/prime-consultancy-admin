@@ -14,6 +14,11 @@ const Dashboard = () => {
   const fetchStats = async () => {
     try {
       const response = await fetch(`${API_URL}/admin/stats`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch stats')
+      }
+      
       const data = await response.json()
       
       setStats([
@@ -27,6 +32,15 @@ const Dashboard = () => {
       setLoading(false)
     } catch (error) {
       console.error('Error fetching stats:', error)
+      // Set default values if fetch fails
+      setStats([
+        { icon: FaCalendar, label: 'Appointments', value: 0, color: 'bg-blue-500' },
+        { icon: FaEnvelope, label: 'Messages', value: 0, color: 'bg-green-500' },
+        { icon: FaBlog, label: 'Blog Posts', value: 0, color: 'bg-purple-500' },
+        { icon: FaChartBar, label: 'Case Studies', value: 0, color: 'bg-orange-500' },
+        { icon: FaStar, label: 'Testimonials', value: 0, color: 'bg-yellow-500' },
+        { icon: FaBriefcase, label: 'Services', value: 0, color: 'bg-indigo-500' },
+      ])
       setLoading(false)
     }
   }

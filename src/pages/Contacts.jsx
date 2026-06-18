@@ -14,11 +14,13 @@ const Contacts = () => {
   const fetchContacts = async () => {
     try {
       const response = await fetch(`${API_URL}/contact`)
+      if (!response.ok) throw new Error('Failed to fetch')
       const data = await response.json()
-      setContacts(data)
+      setContacts(Array.isArray(data) ? data : [])
       setLoading(false)
     } catch (error) {
       console.error('Error fetching contacts:', error)
+      setContacts([])
       setLoading(false)
     }
   }

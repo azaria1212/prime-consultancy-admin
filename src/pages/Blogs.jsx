@@ -14,11 +14,13 @@ const Blogs = () => {
   const fetchBlogs = async () => {
     try {
       const response = await fetch(`${API_URL}/blogs`)
+      if (!response.ok) throw new Error('Failed to fetch')
       const data = await response.json()
-      setBlogs(data)
+      setBlogs(Array.isArray(data) ? data : [])
       setLoading(false)
     } catch (error) {
       console.error('Error fetching blogs:', error)
+      setBlogs([])
       setLoading(false)
     }
   }
