@@ -23,6 +23,54 @@ const Contacts = () => {
     }
   }
 
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this contact?')) return
+    
+    try {
+      const token = localStorage.getItem('adminToken')
+      const response = await fetch(`${API_URL}/contact/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        alert('Contact deleted successfully')
+        fetchContacts()
+      } else {
+        alert('Error deleting contact')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error deleting contact')
+    }
+  }
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem('adminToken')
+      const response = await fetch(`${API_URL}/contact/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      })
+      
+      if (response.ok) {
+        alert('Status updated successfully')
+        fetchContacts()
+      } else {
+        alert('Error updating status')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error updating status')
+    }
+  }
+
   const getStatusBadge = (status) => {
     const styles = {
       new: 'bg-blue-100 text-blue-800',
@@ -80,10 +128,21 @@ const Contacts = () => {
             
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">{new Date(contact.createdAt || contact.date).toLocaleDateString()}</span>
-              <button className="btn-primary flex items-center space-x-2">
-                <FaCheckCircle />
-                <span>Mark as Contacted</span>
-              </button>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => handleStatusChange(contact._id || contact.id, 'contacted')}
+                  className="btn-primary flex items-center space-x-2"
+                >
+                  <FaCheckCircle />
+                  <span>Mark as Contacted</span>
+                </button>
+                <button 
+                  onClick={() => handleDelete(contact._id || contact.id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
           ))

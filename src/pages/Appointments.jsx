@@ -23,6 +23,54 @@ const Appointments = () => {
     }
   }
 
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem('adminToken')
+      const response = await fetch(`${API_URL}/appointments/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      })
+      
+      if (response.ok) {
+        alert('Status updated successfully')
+        fetchAppointments()
+      } else {
+        alert('Error updating status')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error updating status')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this appointment?')) return
+    
+    try {
+      const token = localStorage.getItem('adminToken')
+      const response = await fetch(`${API_URL}/appointments/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        alert('Appointment deleted successfully')
+        fetchAppointments()
+      } else {
+        alert('Error deleting appointment')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error deleting appointment')
+    }
+  }
+
   const getStatusBadge = (status) => {
     const styles = {
       pending: 'bg-yellow-100 text-yellow-800',
@@ -59,11 +107,11 @@ const Appointments = () => {
             </thead>
             <tbody>
               {appointments.map((appointment) => (
-                <tr key={appointment.id} className="hover:bg-gray-50">
+                <tr key={appointment._id || appointment.id} className="hover:bg-gray-50">
                   <td>
                     <div>
-                      <p className="font-semibold text-gray-900">{appointment.name}</p>
-                      <p className="text-sm text-gray-600">{appointment.company}</p>
+                      <p className="font-semibold text-gray-900">{appointment.fullName || appointment.name}</p>
+                      <p className="text-sm text-gray-600">{appointment.companyName || appointment.company || 'No company'}</p>
                     </div>
                   </td>
                   <td>
@@ -78,21 +126,36 @@ const Appointments = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="text-gray-700">{appointment.service}</td>
+                  <td className="text-gray-700">{appointment.serviceNeeded || appointment.service}</td>
                   <td>
                     <div className="flex items-center space-x-2">
                       <FaClock className="text-gray-400" size={14} />
-                      <span>{new Date(appointment.date).toLocaleDateString()}</span>
+                      <span>{new Date(appointment.preferredDate || appointment.date).toLocaleDateString()}</span>
                     </div>
                   </td>
-                  <td>{getStatusBadge(appointment.status)}</td>
+                  <td>{getStatusBadge(appointment.status || 'pending')}</td>
                   <td>
                     <div className="flex space-x-2">
-                      <button className="p-2 text-green-600 hover:bg-green-50 rounded-lg">
+                      <button 
+                        onClick={() => handleStatusChange(appointment._id || appointment.id, 'confirmed')}
+                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                        title="Confirm"
+                      >
                         <FaCheckCircle />
                       </button>
-                      <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                      <button 
+                        onClick={() => handleStatusChange(appointment._id || appointment.id, 'cancelled')}
+                        className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
+                        title="Cancel"
+                      >
                         <FaTimesCircle />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(appointment._id || appointment.id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        title="Delete"
+                      >
+                        Delete
                       </button>
                     </div>
                   </td>
